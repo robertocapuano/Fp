@@ -15,7 +15,7 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
     
-    vector<int> v = { 5, 3 ,1 };
+    vector<int> v = { 5, -3 ,13 };
     
 //    SEQ<vector<int>>  sv(v);
 //    SEQ(v)
@@ -29,11 +29,11 @@ int main(int argc, const char * argv[]) {
     .filter( [] (auto x) {
         return x%2;
     }).
-    map( [] (auto x ) { return x*2; }).sort().get();
-    
-    SEQ(res).forEach(  [] (auto x ) {
-        cout << x << endl;
-
-    });
+    map( [] (auto x ) { return x*2; }).sort().find( [] (auto x) { return x>0; } );
+    cout << res << endl;
+//    SEQ(res).forEach(  [] (auto x ) {
+//        cout << x << endl;
+//
+//    });
     return 0;
 }

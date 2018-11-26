@@ -71,6 +71,33 @@ public:
         return SeqV<T>( std::move(result) );
     }
     
+//    size_t find( const typename T::value_type &v ) {
+//        auto it = std::find( cbegin(seq), cend(seq), v );
+//
+//        return it - cbegin(seq);
+//    }
+    
+    bool exist( const typename T::value_type &v ) {
+        auto it = std::find( cbegin(seq), cend(seq), v );
+
+        return it!=cend(seq);
+    }
+    
+    bool exist( function<SeqR::PRED> pred ) {
+        auto it = std::find( cbegin(seq), cend(seq), pred );
+        
+        return it!=cend(seq);
+    }
+    
+    const typename T::value_type find( function<SeqR::PRED> pred  ) {
+        auto it = find_if( cbegin(seq), cend(seq), pred );
+        
+        if (it==cend(seq))
+            return typename T::value_type();
+        
+        return *it;
+    }
+    
     const T& get() { return seq; }
     
 };
