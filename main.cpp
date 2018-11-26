@@ -25,13 +25,15 @@ int main(int argc, const char * argv[]) {
 //    });
     
     cout << &v << endl;
-    SEQ(v)
+    auto res = SEQ(v)
     .filter( [] (auto x) {
         return x%2;
-    })
-    .forEach(  [] (auto x ) {
+    }).
+    map( [] (auto x ) { return x*2; }).get();
+    
+    SEQ(res).forEach(  [] (auto x ) {
         cout << x << endl;
-        
+
     });
     return 0;
 }

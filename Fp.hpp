@@ -13,49 +13,76 @@
 
 using namespace std;
 
-#define SEQ(X) Seq<decltype(X)>(X)
+template< typename T >
+class SeqV;
 
 template< typename T >
-class Seq
+class SeqR
 {
 public:
     using OP = void(const typename T::value_type &);
     using PRED = bool(const typename T::value_type &);
+    using MAP = typename T::value_type(const typename T::value_type &);
     
-//    const T seq;
     const T &seq;
-
-//    Seq( const T &seq )
-//    : seq( seq )
-//    {}
-
-//    Seq( T seq )
-//    : seq( seq )
-//    {}
-//
     
-    Seq( const T &&seq )
-    : seq( seq )
-    {}
-
-    Seq( T &seq )
+    SeqR( const T &seq )
     : seq( seq )
     {}
 
     void forEach( function<OP> op ) {
-        for_each( begin(seq), end(seq), op );
+        for_each( cbegin(seq), cend(seq), op );
     };
     
-    Seq<T> filter( function<PRED> pred )
+    SeqV<T> filter( function<SeqR::PRED> pred )
     {
         T result;
         
         copy_if( begin(seq), end(seq), back_inserter(result), pred );
         
-        return Seq( std::move(result) );
+        return SeqV<T>( std::move(result) );
     }
+    
+    SeqV<T> map( function<SeqR::MAP> pred )
+    {
+        T result;
+        
+        transform( begin(seq), end(seq), back_inserter(result), pred );
+        
+        return SeqV<T>( std::move(result) );
+    }
+    
+    const T& get() { return seq; }
     
 };
 
+
+template< typename T >
+class SeqV : public SeqR<T>
+{
+public:
+    
+    T seqv;
+    
+    SeqV( T _seqv )
+    : SeqR<T>(seqv),
+        seqv( _seqv )
+    {}
+    
+     T get() { return seqv; }
+};
+
+
+template <typename T>
+SeqV<T> SEQ( const T &&seqv )
+{
+    return SeqV<T>( std::move(seqv) );
+}
+
+template <typename T>
+SeqR<T> SEQ( const T &seqv )
+{
+    return SeqR<T>( seqv );
+}
 
 #endif /* Fp_hpp */
