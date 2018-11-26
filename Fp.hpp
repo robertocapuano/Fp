@@ -10,6 +10,7 @@
 #define Fp_hpp
 
 #include <functional>
+#include <algorithm>
 
 using namespace std;
 
@@ -43,11 +44,29 @@ public:
         return SeqV<T>( std::move(result) );
     }
     
-    SeqV<T> map( function<SeqR::MAP> pred )
+    SeqV<T> map( function<SeqR::MAP> mapper )
     {
         T result;
         
-        transform( begin(seq), end(seq), back_inserter(result), pred );
+        transform( begin(seq), end(seq), back_inserter(result), mapper );
+        
+        return SeqV<T>( std::move(result) );
+    }
+    
+    SeqV<T> sort(  )
+    {
+        T result { seq };
+        
+        std::sort( begin(result), end(result) );
+        
+        return SeqV<T>( std::move(result) );
+    }
+    
+    SeqV<T> sort( function<SeqR::MAP> comp )
+    {
+        T result(seq);
+        
+        std::sort( begin(result), end(result),  comp );
         
         return SeqV<T>( std::move(result) );
     }
@@ -69,7 +88,7 @@ public:
         seqv( _seqv )
     {}
     
-     T get() { return seqv; }
+    T get() { return seqv; }
 };
 
 
