@@ -77,7 +77,7 @@ public:
 //        return it - cbegin(seq);
 //    }
     
-    bool exist( const typename T::value_type &v ) {
+    bool exist( const typename T::value_type &&v ) {
         auto it = std::find( cbegin(seq), cend(seq), v );
 
         return it!=cend(seq);
