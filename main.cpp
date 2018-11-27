@@ -8,14 +8,16 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
+#include <list>
 
-#include "Fp.hpp"
+#include "Fp2.hpp"
 
 using namespace std;
 
 int main(int argc, const char * argv[]) {
     
-    vector<int> v = { 5, -3 ,13 };
+    list<int> v = { 5, -3 ,13 };
     
 //    SEQ<vector<int>>  sv(v);
 //    SEQ(v)
@@ -25,12 +27,18 @@ int main(int argc, const char * argv[]) {
 //    });
     
     cout << &v << endl;
-    auto res = SEQ(v)
+//    cout << v.data() << endl;
+    auto &res = SEQ(v)
     .filter( [] (auto x) {
         return x%2;
     }).
-    map( [] (auto x ) { return x*2; }).sort().find( [] (auto x) { return x>0; } );
-    cout << res << endl;
+    map( [] (auto x ) { return x+x; }).get();//.find( [] (auto x) { return x.size()>1; } );
+    
+//    cout << res[0] << endl;
+    cout << &res<< endl;
+//    cout << (void*) res.data() << endl;
+    
+//    cout << res << endl;
 //    SEQ(res).forEach(  [] (auto x ) {
 //        cout << x << endl;
 //
