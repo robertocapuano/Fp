@@ -14,72 +14,118 @@
 
 using namespace std;
 
-template< typename T >
+template < typename Container, typename Op >
+void forEach( Container &&list, Op f ) {
+    for_each( begin(list), end(list), f );
+}
+
+template < typename Container, typename Op >
+Container transform( const Container &cnt, Op op ) {
+    Container result;
+    
+    transform( begin(cnt), end(cnt), back_inserter(result), op );
+    
+    return result;
+}
+
+template < typename Container, typename Op, typename T >
+T accumulate( const Container &cnt, T &&val, Op op ) {
+    Container result;
+    
+    accumulate( begin(cnt), end(cnt), val, op );
+    
+    return result;
+}
+
+template < typename Container, typename Op >
+Container filter( const Container &cnt, Op op ) {
+    Container result;
+    
+    copy_if( begin(cnt), end(cnt), back_inserter(result), op );
+    
+    return result;
+}
+
+template < typename Container, typename Op >
+Container &remove( Container &cnt, Op op ) {
+    
+    remove_if( begin(cnt), end(cnt), op );
+    
+    return cnt;
+}
+
+
+template<template <typename... Args> class Container, typename T>
 class SeqV;
 
-template< typename T >
+template<template <typename... Args> class Container, typename T>
 class SeqR
 {
 public:
-    using OP = void(const typename T::value_type &);
-    using PRED = bool(const typename T::value_type &);
-    using MAP = typename T::value_type(const typename T::value_type &);
+    using OP = void(const  T &);
+    using PRED = bool(const  T &);
     
-    const T &seq;
+    template <typename S>
+    using MAP = S( const T & );
     
-    SeqR( const T &seq )
+    using COMP = bool( const T &, const T & );
+    
+    const Container<T> &seq;
+    
+    SeqR( const Container<T> &seq )
     : seq( seq )
     {}
-
+    
     void forEach( function<OP> op ) {
         for_each( cbegin(seq), cend(seq), op );
     };
     
-    SeqV<T> filter( function<SeqR::PRED> pred )
+    SeqV<Container,T> filter( function<SeqR::PRED> pred )
     {
-        T result;
+        Container<T> result;
         
         copy_if( begin(seq), end(seq), back_inserter(result), pred );
         
-        return SeqV<T>( std::move(result) );
+        return SeqV<Container,T>( std::move(result) );
     }
     
-    SeqV<T> map( function<SeqR::MAP> mapper )
+    template<typename S>
+    SeqV< Container, S > map( function< SeqR::MAP<S> > mapper )
     {
-        T result;
+        Container<S> result;
         
         transform( begin(seq), end(seq), back_inserter(result), mapper );
         
-        return SeqV<T>( std::move(result) );
+        return SeqV< Container, S  >( std::move(result) );
     }
     
-    SeqV<T> sort(  )
+    SeqV<Container, T> sort(  )
     {
-        T result { seq };
+        Container<T> result { seq };
         
         std::sort( begin(result), end(result) );
         
-        return SeqV<T>( std::move(result) );
+        return SeqV<Container, T>( std::move(result) );
     }
     
-    SeqV<T> sort( function<SeqR::MAP> comp )
+    SeqV<Container,T> sort( function<SeqR::COMP> comp )
     {
-        T result(seq);
+        Container<T> result(seq);
         
         std::sort( begin(result), end(result),  comp );
         
-        return SeqV<T>( std::move(result) );
+        return SeqV<Container,T>( std::move(result) );
     }
     
-//    size_t find( const typename T::value_type &v ) {
-//        auto it = std::find( cbegin(seq), cend(seq), v );
-//
-//        return it - cbegin(seq);
-//    }
-    
-    bool exist( const typename T::value_type &&v ) {
+    size_t find( const T &v ) {
         auto it = std::find( cbegin(seq), cend(seq), v );
-
+        
+        return it - cbegin(seq);
+    }
+    
+    bool exist( const T &&v ) {
+        auto it = std::find( cbegin(seq), cend(seq), v );
+        
         return it!=cend(seq);
     }
     
@@ -89,7 +135,7 @@ public:
         return it!=cend(seq);
     }
     
-    const typename T::value_type find( function<SeqR::PRED> pred  ) {
+    const T find( function<SeqR::PRED> pred  ) {
         auto it = find_if( cbegin(seq), cend(seq), pred );
         
         if (it==cend(seq))
@@ -98,37 +144,41 @@ public:
         return *it;
     }
     
-    const T& get() { return seq; }
+    const Container<T>& get() { return seq; }
+    
+    template<template <typename... Args> class ContainerResult>
+    ContainerResult<T> to() {
+        return ContainerResult<T>( begin(seq), end(seq) );
+    }
     
 };
 
 
-template< typename T >
-class SeqV : public SeqR<T>
+template<template <typename... Args> class Container, typename T>
+class SeqV : public SeqR< Container, T >
 {
 public:
+    Container<T> seqv;
     
-    T seqv;
-    
-    SeqV( T _seqv )
-    : SeqR<T>(seqv),
-        seqv( _seqv )
+    SeqV( Container<T> _seqv )
+    : SeqR<Container,T>(seqv),
+    seqv( _seqv )
     {}
     
-    T get() { return seqv; }
+    Container<T> get() { return seqv; }
 };
 
-
-template <typename T>
-SeqV<T> SEQ( const T &&seqv )
+template<template <typename... Args> class Container, typename T>
+SeqV< Container, T > SEQ( Container<T> &&seqv )
 {
-    return SeqV<T>( std::move(seqv) );
+    return SeqV<  Container, T >( std::move(seqv) );
 }
 
-template <typename T>
-SeqR<T> SEQ( const T &seqv )
+template<template <typename... Args> class Container, typename T>
+SeqR< Container, T > SEQ( const Container<T> &seqv )
 {
-    return SeqR<T>( seqv );
+    return SeqR< Container, T >( seqv );
 }
+
 
 #endif /* Fp_hpp */
