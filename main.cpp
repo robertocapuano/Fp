@@ -11,7 +11,7 @@
 #include <string>
 #include <list>
 
-#include "Fp2.hpp"
+#include "Fp.hpp"
 
 using namespace std;
 
@@ -19,16 +19,17 @@ int main(int argc, const char * argv[]) {
     
     list<int> v = { 5, -3 ,13 };
     
-//    SEQ<vector<int>>  sv(v);
-//    SEQ(v)
-//    .forEach( [] (auto x ) {
-//        cout << x << endl;
-//
-//    });
+    SEQ(v)
+    .sort()
+    .forEach( [] (auto x ) {
+        cout << x << endl;
+
+    });
     
     cout << &v << endl;
+//    cout << (v) << endl;
 //    cout << v.data() << endl;
-    auto &res = SEQ(v)
+    auto res = SEQ(v)
     .filter( [] (auto x) {
         return x%2;
     }).
@@ -36,6 +37,7 @@ int main(int argc, const char * argv[]) {
     
 //    cout << res[0] << endl;
     cout << &res<< endl;
+//    cout << res<< endl;
 //    cout << (void*) res.data() << endl;
     
 //    cout << res << endl;

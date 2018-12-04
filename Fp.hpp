@@ -19,9 +19,18 @@ void forEach( Container &&list, Op f ) {
     for_each( begin(list), end(list), f );
 }
 
-template < typename Container, typename Op >
-Container transform( const Container &cnt, Op op ) {
-    Container result;
+template< typename T, typename S, template <typename... Args> class Container, typename OP>
+Container<T> transform( Container<S> cnt, OP op ) {
+    Container<T> result;
+    
+    transform( begin(cnt), end(cnt), back_inserter(result), op );
+    
+    return result;
+}
+
+template< typename S, template <typename... Args> class Container, typename OP>
+Container<S> transform( Container<S> cnt, OP op ) {
+    Container<S> result;
     
     transform( begin(cnt), end(cnt), back_inserter(result), op );
     
@@ -30,15 +39,11 @@ Container transform( const Container &cnt, Op op ) {
 
 template < typename Container, typename Op, typename T >
 T accumulate( const Container &cnt, T &&val, Op op ) {
-    Container result;
-    
-    accumulate( begin(cnt), end(cnt), val, op );
-    
-    return result;
+    return accumulate( begin(cnt), end(cnt), val, op );
 }
 
 template < typename Container, typename Op >
-Container filter( const Container &cnt, Op op ) {
+Container filter( const Container &&cnt, Op op ) {
     Container result;
     
     copy_if( begin(cnt), end(cnt), back_inserter(result), op );
@@ -99,22 +104,31 @@ public:
         return SeqV< Container, S  >( std::move(result) );
     }
     
-    SeqV<Container, T> sort(  )
+    SeqV< Container, T > map( function< SeqR::MAP<T> > mapper )
     {
-        Container<T> result { seq };
+        Container<T> result;
+        
+        transform( begin(seq), end(seq), back_inserter(result), mapper );
+        
+        return SeqV< Container, T  >( std::move(result) );
+    }
+
+    SeqV<vector, T> sort(  )
+    {
+        vector<T> result { begin(seq), end(seq) };
         
         std::sort( begin(result), end(result) );
         
-        return SeqV<Container, T>( std::move(result) );
+        return SeqV<vector, T>( std::move(result) );
     }
     
-    SeqV<Container,T> sort( function<SeqR::COMP> comp )
+    SeqV<vector,T> sort( function<SeqR::COMP> comp )
     {
-        Container<T> result(seq);
+        vector<T> result(seq);
         
         std::sort( begin(result), end(result),  comp );
         
-        return SeqV<Container,T>( std::move(result) );
+        return SeqV<vector,T>( std::move(result) );
     }
     
     size_t find( const T &v ) {
