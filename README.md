@@ -1,2 +1,2 @@
 # Fp
-JS like functional wrapper for C++ STD containers
+JS & Python like functional wrapper for C++ STD containers
