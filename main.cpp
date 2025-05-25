@@ -11,39 +11,17 @@
 #include <string>
 #include <list>
 
-#include "Fp.hpp"
+#include "FnUtils.h"
 
 using namespace std;
+using namespace Fn;
 
 int main(int argc, const char * argv[]) {
     
-    list<int> v = { 5, -3 ,13 };
+    auto v = fn_vector<int>(10);
+    auto v2 = fn_iota<int>(10,1);
     
-    SEQ(v)
-    .sort()
-    .forEach( [] (auto x ) {
-        cout << x << endl;
-
-    });
+    auto v3 = fn_filter( v2, [] (auto x) { return x>5; } );
     
-    cout << &v << endl;
-//    cout << (v) << endl;
-//    cout << v.data() << endl;
-    auto res = SEQ(v)
-    .filter( [] (auto x) {
-        return x%2;
-    }).
-    map( [] (auto x ) { return x+x; }).get();//.find( [] (auto x) { return x.size()>1; } );
-    
-//    cout << res[0] << endl;
-    cout << &res<< endl;
-//    cout << res<< endl;
-//    cout << (void*) res.data() << endl;
-    
-//    cout << res << endl;
-//    SEQ(res).forEach(  [] (auto x ) {
-//        cout << x << endl;
-//
-//    });
     return 0;
 }

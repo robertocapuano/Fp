@@ -16,16 +16,18 @@
 #include <set>
 #include <numeric>
 #include <map>
+#include <optional>
+#include <memory>
 
-#include "TT.h"
+using namespace std;
 
-TT_BEGIN
+namespace Fn {
 
 template< typename K, typename V >
 set<K> fn_keys_set( const map<K,V> &items )
 {
     set<K> keys;
-
+    
     for ( const auto &[key, _] : items) {
         keys.insert(key);
     }
@@ -79,7 +81,7 @@ Container<T> fn_concat( const Container<T> &cnt_a, const Container<T> &cnt_b )
     
     dst.insert(end(dst),begin(cnt_a), end(cnt_a) );
     dst.insert(end(dst),begin(cnt_b), end(cnt_b) );
-
+    
     return dst;
 }
 
@@ -96,7 +98,7 @@ Container<S> fn_reverse( const Container<S> &cnt )
 }
 
 template< typename S >
-inline vector<S> fn_init( size_t size, S value=S{} )
+inline vector<S> fn_iota( size_t size, S value=S{} )
 {
     vector<S> out(size);
     
@@ -105,7 +107,7 @@ inline vector<S> fn_init( size_t size, S value=S{} )
     return out;
 }
 
-inline vector<int> fn_range( size_t size ) { return fn_init<int>( size ); }
+inline vector<int> fn_range( size_t size ) { return fn_iota<int>( size ); }
 
 template< typename T, template <typename... Args> class Container >
 inline void fn_insert( Container<T> &dst, const Container<T> &src )
@@ -134,7 +136,7 @@ template< typename T, typename S, template <typename... Args> class Container >
 inline T fn_reduce( const Container<S> &cnt, T ini_val, function<T (T,const typename Container<S>::value_type &)> op  )
 {
     T result;
-
+    
     accumulate( cnt.begin(), cnt.end(), ini_val, op );
     
     return result;
@@ -202,6 +204,6 @@ inline _Cnt fn_sort( const _Cnt &in, function<bool(const typename _Cnt::value_ty
     return out;
 }
 
-TT_END
+}
 
 #endif /* FnUtils_h */
